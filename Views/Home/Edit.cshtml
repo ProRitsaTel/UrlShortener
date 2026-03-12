@@ -1,0 +1,30 @@
+@model UrlShortener.Models.ShortUrl
+
+@{
+    ViewData["Title"] = "Редактировать";
+}
+
+<h1>Редактировать ссылку</h1>
+
+@if (!ViewData.ModelState.IsValid)
+{
+    <div style="color:red; margin-bottom:15px;">
+        @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+        {
+            <div>@error.ErrorMessage</div>
+        }
+    </div>
+}
+
+<form asp-action="Edit" method="post">
+    @Html.AntiForgeryToken()
+    <input type="hidden" name="id" value="@Model.Id" />
+
+    <div style="margin-bottom:10px;">
+        <label>Длинный URL</label><br />
+        <input type="text" name="originalUrl" value="@Model.OriginalUrl" style="width:400px;" />
+    </div>
+
+    <button type="submit">Сохранить</button>
+    <a asp-action="Index">Назад</a>
+</form>

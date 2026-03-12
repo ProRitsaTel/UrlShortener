@@ -1,0 +1,56 @@
+@model List<UrlShortener.Models.ShortUrl>
+
+@{
+    ViewData["Title"] = "Сокращение ссылок";
+}
+
+<h1>Сокращение ссылок</h1>
+
+@if (TempData["Error"] != null)
+{
+    <div style="color:red; margin-bottom:15px;">
+        @TempData["Error"]
+    </div>
+}
+
+<form asp-action="Create" method="post" style="margin-bottom:20px;">
+    @Html.AntiForgeryToken()
+    <input type="text" name="originalUrl" style="width:400px;" placeholder="Введите длинный URL" />
+    <button type="submit">Сократить</button>
+</form>
+
+<table border="1" cellpadding="8" cellspacing="0">
+    <thead>
+        <tr>
+            <th>Длинный URL</th>
+            <th>Короткий URL</th>
+            <th>Дата создания</th>
+            <th>Количество переходов</th>
+            <th>Управление</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            var shortUrl = Url.Action("Go", "Home", new { code = item.ShortCode }, Context.Request.Scheme);
+
+            <tr>
+                <td>@item.OriginalUrl</td>
+                <td>
+                    <a href="@shortUrl" target="_blank">@shortUrl</a>
+                </td>
+                <td>@item.CreatedAtUtc.ToLocalTime().ToString("dd.MM.yyyy HH:mm")</td>
+                <td>@item.ClickCount</td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@item.Id">Редактировать</a>
+
+                    <form asp-action="Delete" method="post" style="display:inline;">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="id" value="@item.Id" />
+                        <button type="submit" onclick="return confirm('Удалить запись?')">Удалить</button>
+                    </form>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
